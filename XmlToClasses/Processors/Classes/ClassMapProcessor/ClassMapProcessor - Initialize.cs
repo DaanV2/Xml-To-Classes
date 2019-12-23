@@ -11,7 +11,7 @@ namespace XmlToClasses.Processors {
     public partial class ClassMapProcessor {
         /// <summary>Creates a new instance of <see cref="ClassMapProcessor"/></summary>
         public ClassMapProcessor() {
-            //TODO Fill Constructor for class: ClassMapProcessor
+
         }
     }
 }
