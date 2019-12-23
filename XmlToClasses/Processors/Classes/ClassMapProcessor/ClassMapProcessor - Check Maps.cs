@@ -12,20 +12,22 @@ namespace XmlToClasses.Processors {
 
             for (Int32 I = 0; I < Maps.Count; I++) {
                 for (Int32 J = I + 1; J < Maps.Count; J++) {
-                    if (Equals(Maps[I], Maps[J])) {
-                        //WE FOUND ONE
-                        ClassMap Replacement = new ClassMap() {
-                            Name = "REPLACEMENT" + ReplaceCount,
-                            Properties = Maps[I].Properties
-                        };
+                    if (Maps[I].Name != Maps[J].Name) {
+                        if (Equals(Maps[I], Maps[J])) {
+                            //WE FOUND ONE
+                            ClassMap Replacement = new ClassMap() {
+                                Name = "REPLACEMENT" + ReplaceCount.ToString(),
+                                Properties = Maps[I].Properties
+                            };
 
-                        ReplaceTypes(Maps, Maps[I].Name, Replacement.Name);
-                        ReplaceTypes(Maps, Maps[J].Name, Replacement.Name);
+                            ReplaceTypes(Maps, Maps[I].Name, Replacement.Name);
+                            ReplaceTypes(Maps, Maps[J].Name, Replacement.Name);
 
-                        Maps.Add(Replacement);
-                        Maps.RemoveAt(J--);
-                        Maps.RemoveAt(I--);                        
-                        ReplaceCount++;
+                            Maps.Add(Replacement);
+                            Maps.RemoveAt(J--);
+                            Maps.RemoveAt(I--);
+                            ReplaceCount++;
+                        }
                     }
                 }
             }
@@ -44,9 +46,7 @@ namespace XmlToClasses.Processors {
                 ClassMap Current = Maps[I];
                 for (Int32 J = 0; J < Current.Properties.Count; J++) {
 
-                    if (Current.Properties[J].Type == OldType) {
-                        Current.Properties[J].Type = NewType;
-                    }
+                    Current.Properties[J].Type = Current.Properties[J].Type.Replace(OldType, NewType);
                 }
             }
         }

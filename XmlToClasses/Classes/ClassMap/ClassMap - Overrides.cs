@@ -6,5 +6,8 @@ using System.Threading.Tasks;
 
 namespace XmlToClasses {
     public partial class ClassMap {
+        public override String ToString() {
+            return this.Name;
+        }
     }
 }

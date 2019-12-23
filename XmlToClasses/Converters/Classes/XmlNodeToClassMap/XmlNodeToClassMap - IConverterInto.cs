@@ -18,17 +18,17 @@ namespace XmlToClasses.Converters {
                 Name = Process.Name.Replace(" ", String.Empty)
             };
 
-            Receiver.Add(Out);
-
             XmlAttributeCollection Attributes = Process.Attributes;
             Int32 Length = Attributes.Count;
 
             for (Int32 I = 0; I < Length; I++) {
-                Out.Properties.Add(new PropertyMap() {
-                    Attributes = new List<String>() { $"XmlAttributeAttribute(AttributeName=\"{Attributes[I].Name}\")" },
-                    Name = Attributes[I].Name.Replace(" ", String.Empty).Replace("-", "_"),
-                    Type = TypeIdentifier.DetermineType(Attributes[I].Value)
-                });
+                if (!Attributes[I].Name.StartsWith("#")) {
+                    Out.Properties.Add(new PropertyMap() {
+                        Attributes = new List<String>() { $"XmlAttributeAttribute(AttributeName=\"{Attributes[I].Name}\")" },
+                        Name = Attributes[I].Name.Replace(" ", String.Empty).Replace("-", "_"),
+                        Type = TypeIdentifier.DetermineType(Attributes[I].Value)
+                    });
+                }
             }
 
             XmlNodeList InnerChilds = Process.ChildNodes;
@@ -38,24 +38,29 @@ namespace XmlToClasses.Converters {
             for (Int32 I = 0; I < Length; I++) {
                 InnerC = InnerChilds[I];
 
-                //Child node becomes its own class
-                if ((InnerC.Attributes != null && InnerC.Attributes.Count > 0) || (InnerC.ChildNodes != null && InnerC.ChildNodes.Count > 0)) {
-                    Out.Properties.Add(new PropertyMap() {
-                        Attributes = new List<String>() { $"XmlElementAttribute(ElementName =\"{InnerC.Name}\")" },
-                        Name = InnerC.Name.Replace(" ", String.Empty).Replace("-", "_"),
-                        Type = InnerC.Name.Replace(" ", String.Empty).Replace("-", "_")
-                    });
-                    this.Convert(InnerC, Receiver);
-                }
-                //Just a property
-                else {
-                    Out.Properties.Add(new PropertyMap() {
-                        Attributes = new List<String>() { $"XmlElementAttribute(ElementName=\"{InnerC.Name}\")" },
-                        Name = InnerC.Name.Replace(" ", String.Empty).Replace("-", "_"),
-                        Type = TypeIdentifier.DetermineType(InnerC.Value)
-                    });
+                if (!InnerC.Name.StartsWith("#")) {
+                    //Child node becomes its own class
+                    if ((InnerC.Attributes != null && InnerC.Attributes.Count > 0) || (InnerC.ChildNodes != null && InnerC.ChildNodes.Count > 0)) {
+                        Out.Properties.Add(new PropertyMap() {
+                            Attributes = new List<String>() { $"XmlElementAttribute(ElementName =\"{InnerC.Name}\")" },
+                            Name = InnerC.Name.Replace(" ", String.Empty).Replace("-", "_"),
+                            Type = InnerC.Name.Replace(" ", String.Empty).Replace("-", "_")
+                        });
+                        this.Convert(InnerC, Receiver);
+                    }
+                    //Just a property
+                    else {
+                        Out.Properties.Add(new PropertyMap() {
+                            Attributes = new List<String>() { $"XmlElementAttribute(ElementName=\"{InnerC.Name}\")" },
+                            Name = InnerC.Name.Replace(" ", String.Empty).Replace("-", "_"),
+                            Type = TypeIdentifier.DetermineType(InnerC.Value)
+                        });
+                    }
                 }
             }
+
+            if (Out.Properties.Count > 0)
+                Receiver.Add(Out);
         }
     }
 }

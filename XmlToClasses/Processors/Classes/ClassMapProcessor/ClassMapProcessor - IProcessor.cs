@@ -10,6 +10,7 @@ namespace XmlToClasses.Processors {
         /// <param name="Process"></param>
         public void Process(List<ClassMap> Process) {
             ClassMap Current;
+            this.RemoveDoubles(Process);
             Sorter sorter = new Sorter();
 
             Process.Sort(sorter);
@@ -19,8 +20,7 @@ namespace XmlToClasses.Processors {
                 Current.Properties.Sort(sorter);
 
                 this.FixTypes(Current);
-            }
-
+            }            
             this.CheckMaps(Process);
         }
     }
