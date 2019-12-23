@@ -40,7 +40,27 @@ namespace XmlToClasses.Converters {
 
                 if (!InnerC.Name.StartsWith("#")) {
                     //Child node becomes its own class
-                    if ((InnerC.Attributes != null && InnerC.Attributes.Count > 0) || (InnerC.ChildNodes != null && InnerC.ChildNodes.Count > 0)) {
+                    if (InnerC.Attributes != null && InnerC.Attributes.Count > 0) {
+                        Out.Properties.Add(new PropertyMap() {
+                            Attributes = new List<String>() { $"XmlElementAttribute(ElementName =\"{InnerC.Name}\")" },
+                            Name = InnerC.Name.Replace(" ", String.Empty).Replace("-", "_"),
+                            Type = InnerC.Name.Replace(" ", String.Empty).Replace("-", "_")
+                        });
+                        this.Convert(InnerC, Receiver);
+                    }
+                    else if (InnerC.HasChildNodes) {
+                        if (InnerC.ChildNodes.Count == 1) {
+                            if (InnerC.Name == InnerC.FirstChild.Name || InnerC.FirstChild.NodeType == XmlNodeType.Text) {
+                                Out.Properties.Add(new PropertyMap() {
+                                    Attributes = new List<String>() { $"XmlElementAttribute(ElementName=\"{InnerC.Name}\")" },
+                                    Name = InnerC.Name.Replace(" ", String.Empty).Replace("-", "_"),
+                                    Type = TypeIdentifier.DetermineType(InnerC.FirstChild.Value)
+                                });
+
+                                continue;
+                            }
+                        }
+
                         Out.Properties.Add(new PropertyMap() {
                             Attributes = new List<String>() { $"XmlElementAttribute(ElementName =\"{InnerC.Name}\")" },
                             Name = InnerC.Name.Replace(" ", String.Empty).Replace("-", "_"),
